@@ -4,8 +4,8 @@
 using namespace std;
 
 // global variables
-int totalPopulation = 100;
-// int totalBestPopulation = 100;
+int totalPopulation = 200;
+int totalBestPopulation = 100;
 double mutationRate = 0.1;
 int maxGenerations = 100;
 
@@ -48,6 +48,20 @@ void intialPopulationGen(Chromosome population[], int totalTools)
             int n = dis(gen);
             swap(population[i].individual[m], population[i].individual[n]);
         }
+    }
+}
+// new function to generate the population.
+void initializePopulation(Chromosome population[], int totalTools)
+{
+    for (int i = 0; i < totalPopulation; i++)
+    {
+        // Generate a unique individual
+        for (int j = 0; j < totalTools; j++)
+        {
+            population[i].individual[j] = j;
+        }
+        // Shuffle the individual to make it unique
+        std::shuffle(population[i].individual, population[i].individual + totalTools, mt19937(random_device()()));
     }
 }
 
@@ -124,32 +138,20 @@ void calcFitness(Chromosome population[], vector<vector<int>> &jsm, int totalPop
 
 void selection(Chromosome population[], Chromosome matingPool[], int totalPopulation)
 {
-    // Calculate the total fitness of the population
-    int totalFitness = 0;
+    // Sort the population by fitness in ascending order
+    sort(population, population + totalPopulation, [](const Chromosome &a, const Chromosome &b) { return a.fitnessValue < b.fitnessValue; });
+    // Calculate the total number of ranks
+    int totalRanks = totalPopulation * (totalPopulation + 1) / 2;
+    // Assign selection probability based on rank
     for (int i = 0; i < totalPopulation; i++)
     {
-        totalFitness += population[i].fitnessValue;
-    }
-    // Keep track of selected individuals
-    bool selected[totalPopulation] = {false};
-    // Select individuals for the mating pool
-    for (int i = 0; i < totalPopulation; i++)
-    {
-        double pick = static_cast<double>(rand()) / RAND_MAX;
-        double cumulativeProbability = 0.0;
-        for (int j = 0; j < totalPopulation; j++)
+        double selectionProbability = (double)(i + 1) / totalRanks;
+        int selected = 0;
+        while (selected < totalPopulation && matingPool[selected].fitnessValue < population[i].fitnessValue)
         {
-            if (!selected[j])
-            {
-                cumulativeProbability += static_cast<double>(population[j].fitnessValue) / totalFitness;
-                if (pick <= cumulativeProbability)
-                {
-                    matingPool[i] = population[j];
-                    selected[j] = true; // Mark the individual as selected
-                    break;
-                }
-            }
+            selected++;
         }
+        matingPool[selected] = population[i];
     }
 }
 
@@ -199,6 +201,7 @@ int main()
     toolFreqMat(toolFreq, jsm);
     totalTools = toolFreq.size();
     intialPopulationGen(population, totalTools);
+    initializePopulation(population, totalTools);
     int generation = 0;
     while (generation < maxGenerations)
     {
