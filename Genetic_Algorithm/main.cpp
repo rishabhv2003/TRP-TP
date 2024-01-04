@@ -1,21 +1,23 @@
 #include <bits/stdc++.h>
 #include <ctime>
-
+#include <chrono>
+#include <random>
 using namespace std;
-
-// global variables
-int totalPopulation = 100;
-// int totalBestPopulation = 100;
-double mutationRate = 0.1;
-int maxGenerations = 100;
 
 struct Chromosome
 {
     int fitnessValue;
     int individual[10];
 };
+// global variables
+const int totalPopulation = 100;
+Chromosome population[totalPopulation];
+Chromosome prevPopulation[totalPopulation];
+int totalTools;
+double mutationRate = 0.1;
+int maxGenerations = 10;
+map<int, int> toolFreq;
 
-// function to calculate the ferequency of each tool
 void toolFreqMat(map<int, int> &toolFreq, vector<vector<int>> jsm)
 {
     for (int i = 0; i < jsm.size(); i++)
@@ -27,7 +29,7 @@ void toolFreqMat(map<int, int> &toolFreq, vector<vector<int>> jsm)
     }
 }
 
-// function to generate the initial population.
+
 void intialPopulationGen(Chromosome population[], int totalTools)
 {
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -51,7 +53,7 @@ void intialPopulationGen(Chromosome population[], int totalTools)
     }
 }
 
-// function to print the population in a file named pop_file.txt
+
 void printIndividualsToFile(Chromosome population[], int populationSize, int totalTools)
 {
     ofstream outputFile("pop_size.txt");
@@ -74,7 +76,7 @@ void printIndividualsToFile(Chromosome population[], int populationSize, int tot
     }
 }
 
-// function to print the polation.
+
 void printPopulation(Chromosome population[], int populationSize, int totalTools)
 {
     for (int i = 0; i < populationSize; i++)
@@ -88,7 +90,7 @@ void printPopulation(Chromosome population[], int populationSize, int totalTools
     }
 }
 
-// fitness function
+
 int getElemenetIndex(const vector<int> v, int elm)
 {
     for (int i = 0; i < v.size(); i++)
@@ -122,17 +124,17 @@ void calcFitness(Chromosome population[], vector<vector<int>> &jsm, int totalPop
     }
 }
 
-void selection(Chromosome population[], Chromosome matingPool[], int totalPopulation)
+void selection(Chromosome population[], Chromosome matingPool[])
 {
-    // Calculate the total fitness of the population
+    
     int totalFitness = 0;
     for (int i = 0; i < totalPopulation; i++)
     {
         totalFitness += population[i].fitnessValue;
     }
-    // Keep track of selected individuals
+
     bool selected[totalPopulation] = {false};
-    // Select individuals for the mating pool
+    
     for (int i = 0; i < totalPopulation; i++)
     {
         double pick = static_cast<double>(rand()) / RAND_MAX;
@@ -145,7 +147,7 @@ void selection(Chromosome population[], Chromosome matingPool[], int totalPopula
                 if (pick <= cumulativeProbability)
                 {
                     matingPool[i] = population[j];
-                    selected[j] = true; // Mark the individual as selected
+                    selected[j] = true;
                     break;
                 }
             }
@@ -190,32 +192,30 @@ int main()
         {6, 0, 1, 5, 4},
         {1, 2, 0, 4, 3},
     };
-    // map to store the number of times a tool is used.
-    map<int, int> toolFreq;
-    int totalTools;
-    // generaing a population of 100 individuals.
+    
     Chromosome population[totalPopulation];
-    // making tool frequency matrix
+
     toolFreqMat(toolFreq, jsm);
     totalTools = toolFreq.size();
+    
     intialPopulationGen(population, totalTools);
+
     int generation = 0;
     while (generation < maxGenerations)
     {
-        // Calculate fitness for the current population
         calcFitness(population, jsm, totalPopulation);
-        // Create a mating pool through selection
+
         Chromosome matingPool[totalPopulation];
-        selection(population, matingPool, totalPopulation);
-        // Create the next generation through crossover and mutation
+        // selection(population, matingPool);
+
         for (int i = 0; i < totalPopulation; i += 2)
         {
             int parent1Index = i;
             int parent2Index = i + 1;
             Chromosome child1, child2;
-            // Perform crossover
+    
             crossover(population[parent1Index], population[parent2Index], child1, child2);
-            // Perform mutation
+           
             if (rand() < mutationRate * RAND_MAX)
             {
                 mutate(child1);
@@ -224,12 +224,12 @@ int main()
             {
                 mutate(child2);
             }
-            // Replace parents with children in the population
+            
             population[parent1Index] = child1;
             population[parent2Index] = child2;
         }
-        cout << "Generation " << generation << ":" << endl;
-        printPopulation(population, totalPopulation, totalTools);
+        // cout << "Generation " << generation << ":" << endl;
+        // printPopulation(population, totalPopulation, totalTools);
         generation++;
     }
     printIndividualsToFile(population, totalPopulation, totalTools);
