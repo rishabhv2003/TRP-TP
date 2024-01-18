@@ -1,0 +1,33 @@
+hypothetical dataset.
+vector<vector<int>> tsm = {
+		{6, 4, 0, 2, 9},
+		{3, 6, 9, 8, 7},
+		{6, 0, 1, 5, 4},
+		{1, 2, 0, 4, 3},
+	};
+
+
+WITHOUT TOOL DUPLICATION -
+
+1. dataset for 15 operations with 10 cutting tools. ATC positions = 10
+vector<vector<int>> tsm = {
+		{0, 1, 2, 3, 4},
+		{5, 2, 5, 6, 2},
+		{7, 8, 5, 8, 9},
+	};
+Optimal value = 25 rotations
+Resultant optimal value = 25 rotations
+population size = 100
+iteratinos = 10
+
+2. dataset for 16 operations with 10 cutting tools. ATC positions = 10
+vector<vector<int>> tsm = {
+		{0, 0, 4, 3},
+		{1, 8, 6, 2},
+		{2, 2, 8, 8},
+		{8, 9, 7, 5},
+	};
+Optimal value = 13 rotations
+Resultant optimal value = 13 rotations
+population size = 50
+iteratinos = 100

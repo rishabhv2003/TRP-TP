@@ -6,8 +6,8 @@
 #include <unordered_map>
 #include <cstdlib>
 #include <time.h>
-
 using namespace std;
+
 class Chromosome {
 public:
 	int fitness;
@@ -15,17 +15,15 @@ public:
 	bool operator==(const Chromosome& other) const {
 		return (fitness == other.fitness) && (individual == other.individual);
 	}
-	bool operator!=(const Chromosome& other) const {
-		return !(*this == other);
-	}
 };
 
 // Global variables
-const int totalPopulation = 100;
-const int maxGenerations = 10;
+const int totalPopulation = 50;
+const int maxGenerations = 100;
 int totalTools = 0;
 vector<Chromosome> population(totalPopulation);
 vector<Chromosome> auxPopulation(totalPopulation);
+Chromosome bestIndividual;
 unordered_map<int, int> toolFreqMatrix;
 
 // Function prototypes
@@ -41,52 +39,47 @@ void mutate();
 
 int main() {
 	// We can implement input for the tools and the tool sequence matrix.
-
 	vector<int> toolBatch = {20, 30, 20, 15};
 	// the tool sequence matrix contains the sequence of tools required for
 	// operating on each batch.
 	vector<vector<int>> tsm = {
-		{6, 4, 0, 2, 9},
-		{3, 6, 9, 8, 7},
-		{6, 0, 1, 5, 4},
-		{1, 2, 0, 4, 3},
+		{0, 0, 4, 3},
+		{1, 8, 6, 2},
+		{2, 2, 8, 8},
+		{8, 9, 7, 5},
 	};
 
 	calculateToolFrequency(tsm);
 	totalTools = toolFreqMatrix.size();
 
 	initialPopulationGen();
-	cout << "Calculating fitness..." << endl;
 	calculateFitness(tsm);
-	cout << "Fitness calculated..." << endl;
 	printPopulation();
 
-	for (int i = 0; i < 2; ++i) {
-		cout << "Before Selection" << endl;
+	for (int i = 0; i < maxGenerations; ++i) {
+		// cout << "Before Selection" << endl;
 		selection();
-		cout << "After Selection" << endl;
-		printPopulation();
-		cout << "Before Crossover" << endl;
+		// cout << "After Selection" << endl;
+
+		// cout << "Before Crossover" << endl;
 		crossover();
-		cout << "After Crossover" << endl;
+		// cout << "After Crossover" << endl;
 
-		cout << "Before Mutation" << endl;
+		// cout << "Before Mutation" << endl;
 		mutate();
-		cout << "After Mutation" << endl;
+		// cout << "After Mutation" << endl;
 
-		cout << "before calculate fitness" << endl;
+		// cout << "before calculate fitness" << endl;
 		calculateFitness(tsm);
-		cout << "after calculate fitness" << endl;
+		// cout << "after calculate fitness" << endl;
 
 		cout << "Population after " << i + 1 << "th iteration" << endl;
 
 		printPopulation();
 	}
-
 	return 0;
 }
 
-// Function definitions
 
 // This function stores the frequency of each tool in the toolFreqMatrix (map).
 void calculateToolFrequency(const vector<vector<int>>& tsm) {
@@ -146,7 +139,6 @@ void calculateFitness(const vector<vector<int>>& tsm) {
 	}
 }
 
-
 bool compareChromosomes(const Chromosome &a, const Chromosome &b) {
 	return a.fitness < b.fitness;
 }
@@ -158,75 +150,67 @@ void selection() {
 	Chromosome best1;
 	Chromosome best2;
 	best1 = population[0];
-	best2 = population[1];
-	for (int i = 2; i < totalPopulation; i++) {
+	for (int i = 1; i < totalPopulation; i++) {
 		if (population[i].fitness < best1.fitness) {
-			best2 = best1;
 			best1 = population[i];
-		} else if (population[i].fitness < best2.fitness) {
-			best2 = population[i];
 		}
 	}
-	auxPopulation.push_back(best1);
-	auxPopulation.push_back(best2);
-	for (int i = 2; i < totalPopulation; i += 2) {
+	auxPopulation.assign({best1});
+
+	for (int i = 1; i < totalPopulation; i += 2) {
 		Chromosome p1;
 		Chromosome p2;
+		p1.fitness = 0;
+		p2.fitness = 0;
 		vector<Chromosome> in(3);
 		while (p1 == p2) {
 			in[0] = population[rand() % totalPopulation];
 			in[1] = population[rand() % totalPopulation];
 			in[2] = population[rand() % totalPopulation];
 			p1 = findMinFitnessChromosome(in);
+			// cout << "p1 fitness " << p1.fitness << endl;
 			in[0] = population[rand() % totalPopulation];
 			in[1] = population[rand() % totalPopulation];
 			in[2] = population[rand() % totalPopulation];
 			p2 = findMinFitnessChromosome(in);
-			cout << "not equal" << endl;
+			// cout << "p2 fitness " << p2.fitness << endl;
 		}
 		auxPopulation.push_back(p1);
 		auxPopulation.push_back(p2);
 	}
-	population = auxPopulation;
+	population.assign(auxPopulation.begin(), auxPopulation.end());
 	auxPopulation.clear();
 }
 
+
 void crossover() {
 	const double crossover_rate = 0.8;
-
-	for (int i = 0; i < totalPopulation; i += 2) {
+	for (int i = 1; i < totalPopulation; i += 2) {
 		// Randomly decide whether to perform crossover
 		if (static_cast<double>(rand()) / RAND_MAX < crossover_rate) {
 			// Select a random crossover point
 			int crossover_point = rand() % (totalTools - 1) + 1;
-
 			// Perform one-point crossover
 			vector<int>& parent1 = population[i].individual;
 			vector<int>& parent2 = population[i + 1].individual;
-
 			vector<int> child1(totalTools, -1);
 			vector<int> child2(totalTools, -1);
-
 			// Fill the crossover segment
 			copy(parent2.begin() + crossover_point, parent2.end(), child1.begin() + crossover_point);
 			copy(parent1.begin() + crossover_point, parent1.end(), child2.begin() + crossover_point);
-
 			// Fill the remaining positions with unused numbers
 			vector<int> unused_numbers1;
 			vector<int> unused_numbers2;
-
 			for (int num : parent1) {
 				if (find(child1.begin(), child1.end(), num) == child1.end()) {
 					unused_numbers1.push_back(num);
 				}
 			}
-
 			for (int num : parent2) {
 				if (find(child2.begin(), child2.end(), num) == child2.end()) {
 					unused_numbers2.push_back(num);
 				}
 			}
-
 			int index1 = 0, index2 = 0;
 			for (int j = 0; j < totalTools; ++j) {
 				if (child1[j] == -1) {
@@ -237,7 +221,6 @@ void crossover() {
 					child2[j] = unused_numbers2[index2++];
 				}
 			}
-
 			// Update the population with the new individuals
 			population[i].individual = child1;
 			population[i + 1].individual = child2;
@@ -248,7 +231,7 @@ void crossover() {
 void mutate() {
 	const double mutation_rate = 0.1;
 
-	for (int i = 0; i < totalPopulation; ++i) {
+	for (int i = 1; i < totalPopulation; ++i) {
 		// Randomly decide whether to perform mutation
 		if (static_cast<double>(rand()) / RAND_MAX < mutation_rate) {
 			// Select two distinct positions for mutation
