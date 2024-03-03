@@ -40,11 +40,10 @@ int main()
 {
     vector<int> toolBatch = {20, 30, 20, 15};
     vector<vector<int>> tsm = {
-        {0, 0, 4, 3},
-        {1, 8, 6, 2},
-        {2, 2, 8, 8},
-        {8, 9, 7, 5},
-    };
+		{0, 1, 2, 3, 4},
+		{5, 2, 5, 6, 2},
+		{7, 8, 5, 8, 9},
+	};
 
     calculateToolFrequency(tsm);
     totalTools = toolFreqMatrix.size();

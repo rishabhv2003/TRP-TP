@@ -1,2 +1,2 @@
-# Integration of Tool Management Issues in Automated Manufacturing Systems
+# Tool Indexing Optimization Problem Considering tool life and tool duplicates.
 

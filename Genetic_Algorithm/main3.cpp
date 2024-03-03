@@ -40,16 +40,10 @@ void traverseToolLifeStore();
 int main()
 {
     srand(time(NULL));
-    // vector<int> tsm = {2, 4, 0, 5, 2, 5, 1, 3, 2, 0};
-    // vector<int> tsm = {0, 1, 2, 3, 4, 5, 2, 5, 6, 2, 7, 8, 5, 8, 9};
-    // vector<int> tsm = {0, 0, 4, 3, 1, 8, 6, 2, 2, 2, 8, 8, 8, 9, 7, 5};
     vector<int> tsm = {0, 1, 5, 4, 6, 4, 5, 6, 3, 2};
     Chromosome myChromosome;
     myChromosome.fitness = 100;
-    // myChromosome.individual = {0, 2, 3, 4, 5, 2, 3, 1, 2, 1};
-    // myChromosome.individual = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    // myChromosome.toolLife = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
-    // myChromosome.toolLife = {10, 10, 10, 10, 10, 10, 10, 10, 10, 10};
+
     myChromosome.individual = {
         0, 0, 0, 0, 0, 0, 0, 0, 0,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -79,7 +73,7 @@ int main()
     calculateFitness(tsm);
     for (int i = 0; i < maxGenerations; ++i)
     {
-        cout << "Before Selection" << endl;
+        // cout << "Before Selection" << endl;
         selection();
         // cout << "After Selection" << endl;
 
@@ -185,7 +179,6 @@ void crossover()
         }
     }
 }
-
 void mutate()
 {
     const double mutation_rate = 0.1;
@@ -256,7 +249,6 @@ int getElementIndex(const vector<int> &v, vector<int> &l, int elm, int currIndex
     if (res.size() == 0)
     {
         cout << "Tool life not sufficient for tool " << elm << endl;
-        // exit(0);
         return -1;
     }
     for (int i = 0; i < res.size(); i++)
@@ -278,7 +270,6 @@ int getElementIndex(const vector<int> &v, vector<int> &l, int elm, int currIndex
             index = res[i];
         }
     }
-    l[index]--;
     return index;
 }
 
@@ -286,22 +277,22 @@ void calculateFitness(const vector<int> &tsm)
 {
     for (int i = 0; i < totalPopulation; ++i)
     {
-
         int currIndex = 0;
         int cost = 0;
         vector<int> v(population[i].individual.begin(), population[i].individual.begin() + totalTools);
-        vector<int> l(population[i].toolLife.begin(), population[i].toolLife.begin() + totalTools);
-        for (int ii = 0; ii < 1304; ii++)
+        vector<int> &l = population[i].toolLife;
+        vector<int> usedTool;
+        for (int ii = 0; ii < 1304; ii++) // for the number of jobs to be manufactured.
         {
             for (int tool : tsm)
             {
                 int t1, t2;
                 int n = v.size();
                 int toolIndex = getElementIndex(v, l, tool, currIndex);
+                usedTool.push_back(toolIndex);
                 if (toolIndex == -1)
                 {
-                    cout << "breaking due to insufficient life" << endl;
-                    cout << "Number of crankshafts made = " << ii << endl;
+                    cout << "Number of crankshafts made = " << ii - 1 << endl;
                     return;
                 }
                 t1 = abs(currIndex - toolIndex);
@@ -315,6 +306,13 @@ void calculateFitness(const vector<int> &tsm)
                 }
                 cost += min(t1, t2);
                 currIndex = toolIndex;
+            }
+            for (int toolIndex : usedTool)
+            {
+                if (toolIndex != -1)
+                {
+                    l[toolIndex]--;
+                }
             }
         }
         population[i].toolLife = l;
