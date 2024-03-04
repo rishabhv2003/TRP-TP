@@ -6,6 +6,8 @@
 #include <numeric>
 #include <unordered_map>
 #include <ctime>
+#include <set>
+#include "./Helper.h"
 using namespace std;
 
 class Chromosome
@@ -20,8 +22,9 @@ public:
     }
 };
 
-const int totalPopulation = 50;
-const int maxGenerations = 100;
+const int totalPopulation = 5;
+const int maxGenerations = 4;
+const int productQuantity = 30;
 int totalTools;
 vector<Chromosome> population(totalPopulation);
 vector<Chromosome> auxPopulation(totalPopulation);
@@ -40,28 +43,29 @@ void traverseToolLifeStore();
 int main()
 {
     srand(time(NULL));
-    vector<int> tsm = {0, 1, 5, 4, 6, 4, 5, 6, 3, 2};
+    // vector<int> tsm = {0, 1, 5, 4, 6, 4, 5, 6, 3, 2};
+    vector<int> tsm = {3, 1, 2, 3, 0};
     Chromosome myChromosome;
-    myChromosome.fitness = 100;
+    // myChromosome.fitness = 100;
 
-    myChromosome.individual = {
-        0, 0, 0, 0, 0, 0, 0, 0, 0,
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        2, 2, 2, 2,
-        3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-        4, 4, 4, 4,
-        5, 5, 5, 5,
-        6, 6, 6, 6};
-
-    myChromosome.toolLife = {
-        154, 154, 154, 154, 154, 154, 154, 154, 154,
-        131, 131, 131, 131, 131, 131, 131, 131, 131, 131,
-        326, 326, 326, 326,
-        326, 326, 326, 326, 326, 326, 326, 326, 326, 326,
-        326, 326, 326, 326,
-        326, 326, 326, 326,
-        326, 326, 326, 326};
-
+    // myChromosome.individual = {
+    //     0, 0, 0, 0, 0, 0, 0, 0, 0,
+    //     1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    //     2, 2, 2, 2,
+    //     3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+    //     4, 4, 4, 4,
+    //     5, 5, 5, 5,
+    //     6, 6, 6, 6};
+    myChromosome.individual = {0, 0, 1, 1, 1, 2, 2, 3};
+    // myChromosome.toolLife = {
+    //     154, 154, 154, 154, 154, 154, 154, 154, 154,
+    //     131, 131, 131, 131, 131, 131, 131, 131, 131, 131,
+    //     326, 326, 326, 326,
+    //     326, 326, 326, 326, 326, 326, 326, 326, 326, 326,
+    //     326, 326, 326, 326,
+    //     326, 326, 326, 326,
+    //     326, 326, 326, 326};
+    myChromosome.toolLife = {15, 15, 10, 10, 10, 15, 15, 31};
     totalTools = myChromosome.individual.size();
     for (int i = 0; i < totalTools; i++)
     {
@@ -281,18 +285,18 @@ void calculateFitness(const vector<int> &tsm)
         int cost = 0;
         vector<int> v(population[i].individual.begin(), population[i].individual.begin() + totalTools);
         vector<int> &l = population[i].toolLife;
-        vector<int> usedTool;
-        for (int ii = 0; ii < 1304; ii++) // for the number of jobs to be manufactured.
+        set<int> usedTool;
+        for (int j = 0; j < productQuantity; j++)
         {
             for (int tool : tsm)
             {
                 int t1, t2;
                 int n = v.size();
                 int toolIndex = getElementIndex(v, l, tool, currIndex);
-                usedTool.push_back(toolIndex);
+                usedTool.insert(toolIndex);
                 if (toolIndex == -1)
                 {
-                    cout << "Number of crankshafts made = " << ii - 1 << endl;
+                    cout << "Number of crankshafts made = " << j - 1 << endl;
                     return;
                 }
                 t1 = abs(currIndex - toolIndex);
@@ -314,6 +318,7 @@ void calculateFitness(const vector<int> &tsm)
                     l[toolIndex]--;
                 }
             }
+            usedTool.clear();
         }
         population[i].toolLife = l;
         population[i].fitness = cost;

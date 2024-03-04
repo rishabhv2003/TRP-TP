@@ -69,5 +69,6 @@
         "typeindex": "cpp",
         "typeinfo": "cpp",
         "valarray": "cpp"
-    }
+    },
+    "CodeGPT.apiKey": "Vertex"
 }
