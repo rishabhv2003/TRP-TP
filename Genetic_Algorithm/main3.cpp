@@ -22,9 +22,9 @@ public:
     }
 };
 
-const int totalPopulation = 5;
-const int maxGenerations = 4;
-const int productQuantity = 30;
+const int totalPopulation = 100;
+const int maxGenerations = 100;
+const int productQuantity = 1304;
 int totalTools;
 vector<Chromosome> population(totalPopulation);
 vector<Chromosome> auxPopulation(totalPopulation);
@@ -43,29 +43,28 @@ void traverseToolLifeStore();
 int main()
 {
     srand(time(NULL));
-    // vector<int> tsm = {0, 1, 5, 4, 6, 4, 5, 6, 3, 2};
-    vector<int> tsm = {3, 1, 2, 3, 0};
+    vector<int> tsm = {0, 1, 5, 4, 6, 4, 5, 6, 3, 2};
+    // vector<int> tsm = {3, 1, 2, 3, 0};
     Chromosome myChromosome;
     // myChromosome.fitness = 100;
-
-    // myChromosome.individual = {
-    //     0, 0, 0, 0, 0, 0, 0, 0, 0,
-    //     1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    //     2, 2, 2, 2,
-    //     3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-    //     4, 4, 4, 4,
-    //     5, 5, 5, 5,
-    //     6, 6, 6, 6};
-    myChromosome.individual = {0, 0, 1, 1, 1, 2, 2, 3};
-    // myChromosome.toolLife = {
-    //     154, 154, 154, 154, 154, 154, 154, 154, 154,
-    //     131, 131, 131, 131, 131, 131, 131, 131, 131, 131,
-    //     326, 326, 326, 326,
-    //     326, 326, 326, 326, 326, 326, 326, 326, 326, 326,
-    //     326, 326, 326, 326,
-    //     326, 326, 326, 326,
-    //     326, 326, 326, 326};
-    myChromosome.toolLife = {15, 15, 10, 10, 10, 15, 15, 31};
+    myChromosome.individual = {
+        0, 0, 0, 0, 0, 0, 0, 0, 0,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        2, 2, 2, 2,
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+        4, 4, 4, 4,
+        5, 5, 5, 5,
+        6, 6, 6, 6};
+    // myChromosome.individual = {0, 0, 1, 1, 1, 2, 2, 3};
+    myChromosome.toolLife = {
+        154, 154, 154, 154, 154, 154, 154, 154, 154,
+        131, 131, 131, 131, 131, 131, 131, 131, 131, 131,
+        326, 326, 326, 326,
+        326, 326, 326, 326, 326, 326, 326, 326, 326, 326,
+        326, 326, 326, 326,
+        326, 326, 326, 326,
+        326, 326, 326, 326};
+    // myChromosome.toolLife = {150, 150, 100, 100, 100, 150, 150, 300};
     totalTools = myChromosome.individual.size();
     for (int i = 0; i < totalTools; i++)
     {
