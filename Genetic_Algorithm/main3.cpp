@@ -1,5 +1,4 @@
 // Genetic Algorithm for Tool Placement with Tools duplication.
-
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -7,7 +6,6 @@
 #include <unordered_map>
 #include <ctime>
 #include <set>
-#include "./Helper.h"
 using namespace std;
 
 class Chromosome
@@ -22,9 +20,9 @@ public:
     }
 };
 
-const int totalPopulation = 100;
-const int maxGenerations = 100;
-const int productQuantity = 1304;
+const int totalPopulation = 50;
+const int maxGenerations = 2;
+const int productQuantity = 300;
 int totalTools;
 vector<Chromosome> population(totalPopulation);
 vector<Chromosome> auxPopulation(totalPopulation);
@@ -43,29 +41,31 @@ void traverseToolLifeStore();
 int main()
 {
     srand(time(NULL));
-    vector<int> tsm = {0, 1, 5, 4, 6, 4, 5, 6, 3, 2};
-    // vector<int> tsm = {3, 1, 2, 3, 0};
+    // vector<int> tsm = {0, 1, 5, 4, 6, 4, 5, 6, 3, 2};
+    vector<int> tsm = {3, 1, 2, 3, 0};
     Chromosome myChromosome;
-    // myChromosome.fitness = 100;
-    myChromosome.individual = {
-        0, 0, 0, 0, 0, 0, 0, 0, 0,
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        2, 2, 2, 2,
-        3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-        4, 4, 4, 4,
-        5, 5, 5, 5,
-        6, 6, 6, 6};
-    // myChromosome.individual = {0, 0, 1, 1, 1, 2, 2, 3};
-    myChromosome.toolLife = {
-        154, 154, 154, 154, 154, 154, 154, 154, 154,
-        131, 131, 131, 131, 131, 131, 131, 131, 131, 131,
-        326, 326, 326, 326,
-        326, 326, 326, 326, 326, 326, 326, 326, 326, 326,
-        326, 326, 326, 326,
-        326, 326, 326, 326,
-        326, 326, 326, 326};
-    // myChromosome.toolLife = {150, 150, 100, 100, 100, 150, 150, 300};
+
+    // myChromosome.individual = {
+    //     0, 0, 0, 0, 0, 0, 0, 0, 0,
+    //     1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    //     2, 2, 2, 2,
+    //     3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+    //     4, 4, 4, 4,
+    //     5, 5, 5, 5,
+    //     6, 6, 6, 6};
+    myChromosome.individual = {0, 0, 1, 1, 1, 2, 2, 3};
+    // myChromosome.toolLife = {
+    //     154, 154, 154, 154, 154, 154, 154, 154, 154,
+    //     131, 131, 131, 131, 131, 131, 131, 131, 131, 131,
+    //     326, 326, 326, 326,
+    //     326, 326, 326, 326, 326, 326, 326, 326, 326, 326,
+    //     326, 326, 326, 326,
+    //     326, 326, 326, 326,
+    //     326, 326, 326, 326};
+    myChromosome.toolLife = {150, 150, 100, 100, 100, 150, 150, 300};
     totalTools = myChromosome.individual.size();
+    // totalTools = 45;
+    cout << "Total Tools " << totalTools << endl;
     for (int i = 0; i < totalTools; i++)
     {
         toolLifeStore[myChromosome.individual[i]] = myChromosome.toolLife[i];
@@ -76,26 +76,11 @@ int main()
     calculateFitness(tsm);
     for (int i = 0; i < maxGenerations; ++i)
     {
-        // cout << "Before Selection" << endl;
         selection();
-        // cout << "After Selection" << endl;
-
-        // cout << "Before Crossover" << endl;
         // crossover();
-        // cout << "After Crossover" << endl;
-
-        // cout << "Before Mutation" << endl;
         mutate();
-        // cout << "After Mutation" << endl;
-
-        // cout << "Before tool life" << endl;
         regenerateToolLife();
-        // cout << "After tool life" << endl;
-
-        // cout << "before calculate fitness" << endl;
         calculateFitness(tsm);
-        // cout << "after calculate fitness" << endl;
-
         cout << "Population after " << i + 1 << "th iteration" << endl;
         traversePopulation();
     }
@@ -282,7 +267,7 @@ void calculateFitness(const vector<int> &tsm)
     {
         int currIndex = 0;
         int cost = 0;
-        vector<int> v(population[i].individual.begin(), population[i].individual.begin() + totalTools);
+        const vector<int> &v = population[i].individual;
         vector<int> &l = population[i].toolLife;
         set<int> usedTool;
         for (int j = 0; j < productQuantity; j++)
@@ -295,8 +280,8 @@ void calculateFitness(const vector<int> &tsm)
                 usedTool.insert(toolIndex);
                 if (toolIndex == -1)
                 {
-                    cout << "Number of crankshafts made = " << j - 1 << endl;
-                    return;
+                    cout << "Number of crankshafts made = " << j + 1 << endl;
+                    exit(0);
                 }
                 t1 = abs(currIndex - toolIndex);
                 if (currIndex > toolIndex)
